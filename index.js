@@ -1,13 +1,9 @@
 const request = require('request');
-const { fetchCoordsByIP } = require('./iss')
+const { fetchCoordsByIP, fetchISSFlyOverTimes } = require('./iss')
 
 
 const fetchMyIP = (callback) => {
   request(`https://api.ipify.org/?format=json`, (error, response, body) => {
-    if (!error) {
-      const data = JSON.parse(body).ip;
-      callback(null, data);
-    }
     if (error) {
       callback((`The following error has occured: `, error), null);
       return;
@@ -17,17 +13,30 @@ const fetchMyIP = (callback) => {
       callback(Error(msg), null);
       return;
     }
+    const data = JSON.parse(body).ip;
+      callback(null, data);
   });
 };
+// let coordinates;
 
-fetchCoordsByIP("INVALID_IP", (error, data) => {
+// fetchCoordsByIP("207.6.165.11", (error, data) => {
+//   if (error) {
+//     console.log(`Uh-oh! It didn't work :( here's your error: `, error);
+//     return;
+//   }
+//   console.log(data);
+//   coordinates = data;
+// });
+
+const testCoords = { Latitude: '48.5249', Longitude: '-123.3615' }
+
+fetchISSFlyOverTimes(testCoords, (error, data) => {
   if (error) {
     console.log(`Uh-oh! It didn't work :( here's your error: `, error);
     return;
   }
-  console.log(data);
-});
-
+  console.log(`Flyover times:  `, data);
+})
 
 
 module.exports = {
