@@ -1,54 +1,19 @@
-const request = require('request');
-const { fetchCoordsByIP, fetchISSFlyOverTimes } = require('./iss')
+const { nextISSTimesForMe } = require('./iss');
 
 
-const fetchMyIP = (callback) => {
-  request(`https://api.ipify.org/?format=json`, (error, response, body) => {
-    if (error) {
-      callback((`The following error has occured: `, error), null);
-      return;
-    }
-    if (response.statusCode !== 200) {
-      const msg = `Oop, the status code ${response.statusCode} suddenly appeared! Response: ${body}`;
-      callback(Error(msg), null);
-      return;
-    }
-    const data = JSON.parse(body).ip;
-      callback(null, data);
-  });
-};
-// let coordinates;
-
-// fetchCoordsByIP("207.6.165.11", (error, data) => {
-//   if (error) {
-//     console.log(`Uh-oh! It didn't work :( here's your error: `, error);
-//     return;
-//   }
-//   console.log(data);
-//   coordinates = data;
-// });
-
-const testCoords = { Latitude: '48.5249', Longitude: '-123.3615' }
-
-fetchISSFlyOverTimes(testCoords, (error, data) => {
-  if (error) {
-    console.log(`Uh-oh! It didn't work :( here's your error: `, error);
-    return;
+const printPassTimes = (passTimes) => {
+  for (const pass of passTimes) {
+    const datetime = new Date(0);
+    datetime.setUTCSeconds(pass.risetime);
+    const duration = pass.duration;
+    console.log(`The ISS will pass you on ${datetime} for ${duration} seconds!`);
   }
-  console.log(`Flyover times:  `, data);
-})
+};
 
+nextISSTimesForMe((error, passTimes) => {
+  if (error) {
+    return console.log(`Something went wrong! Error:  `, error);
+  }
+  printPassTimes(passTimes);
+});
 
-module.exports = {
-  fetchMyIP
-}
-
-
-
-// fetchMyIP((error, ip) => {
-//   if (error) {
-//     console.log(`Uh-oh! It didn't work :( here's your error: `, error);
-//     return;
-//   }
-//   console.log(`It worked! Here's your IPV4 address: `, ip);
-// })
